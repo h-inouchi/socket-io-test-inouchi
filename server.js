@@ -13,10 +13,23 @@ const server = express()
 
 const io = socketIO(server);
 
+var counter = 0;
+
 io.on('connection', (socket) => {
+  counter++;
+  console.log("counter:" + counter);
+
+  socket.on('sendMsgFromClient', function(msg) {
+    io.emit('sendMsgFromServer', '[Hello From Server]msg=' + msg);
+  });
+
   console.log('Client connected');
-  socket.on('disconnect', () => console.log('Client disconnected'));
+
+  socket.on('disconnect', function() {
+    counter--;
+    console.log('disconnect.count: ', counter);
+    console.log('Client disconnected');
+  });
 });
 
 setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
-

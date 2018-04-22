@@ -3,7 +3,27 @@
     <p id='server-time'></p>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      var socket = io();
+      //var socket = io();
+      var socket = io({ forceNew: true });
+
+      var maxConnect = 7001;
+      var connectCounter = 0;
+
+      for (var i = 0; i < maxConnect; i++) {
+        socket.connect();
+        socket.on('connect', function (data) {
+          connectCounter += 1;
+          console.log("connect.connectCounter = " + connectCounter);
+        });
+        socket.on('sendMsgFromServer', function (msg) {
+          console.log("message:" , msg);
+        });
+      }
+
+      setTimeout(function() {
+        socket.emit("sendMsgFromClient", "send client msg");
+      }, 3000);
+
       var el = document.getElementById('server-time');
       socket.on('time', function(timeString) {
         el.innerHTML = 'Server time: ' + timeString;
